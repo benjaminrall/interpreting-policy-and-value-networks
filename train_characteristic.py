@@ -20,6 +20,7 @@ from torch.utils.data import DataLoader, TensorDataset
 if __name__ == '__main__':
     # Reads command line argument for config file path
     parser = argparse.ArgumentParser()
+    
     parser.add_argument(
         '--config-file', '-c',
         type=argparse.FileType('r'),

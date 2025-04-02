@@ -50,32 +50,32 @@ class PolicyCharacteristic(nn.Module):
         return layer
     
     def _construct_network(self):
-        # self.network = nn.Sequential(
-        #     self._init_layer(nn.Conv2d(4, 64, 8, stride=4)),
-        #     nn.ReLU(),
-        #     self._init_layer(nn.Conv2d(64, 128, 4, stride=2)),
-        #     nn.ReLU(),\
-        #     self._init_layer(nn.Conv2d(128, 64, 3, stride=1)),
-        #     nn.ReLU(),
-        #     nn.Flatten(),
-        #     self._init_layer(nn.Linear(64 * 7 * 7, 1024)),
-        #     nn.ReLU(),
-        #     self._init_layer(nn.Linear(1024, 512)),
-        #     nn.ReLU(),
-        #     self._init_layer(nn.Linear(512, self.output_size), weight_std=0.01),
-        # )
         self.network = nn.Sequential(
-            self._init_layer(nn.Conv2d(4, 32, 8, stride=4)),
+            self._init_layer(nn.Conv2d(4, 64, 8, stride=4)),
             nn.ReLU(),
-            self._init_layer(nn.Conv2d(32, 64, 4, stride=2)),
-            nn.ReLU(),
-            self._init_layer(nn.Conv2d(64, 64, 3, stride=1)),
+            self._init_layer(nn.Conv2d(64, 128, 4, stride=2)),
+            nn.ReLU(),\
+            self._init_layer(nn.Conv2d(128, 64, 3, stride=1)),
             nn.ReLU(),
             nn.Flatten(),
-            self._init_layer(nn.Linear(64 * 7 * 7, 512)),
+            self._init_layer(nn.Linear(64 * 7 * 7, 1024)),
+            nn.ReLU(),
+            self._init_layer(nn.Linear(1024, 512)),
             nn.ReLU(),
             self._init_layer(nn.Linear(512, self.output_size), weight_std=0.01),
         )
+        # self.network = nn.Sequential(
+        #     self._init_layer(nn.Conv2d(4, 32, 8, stride=4)),
+        #     nn.ReLU(),
+        #     self._init_layer(nn.Conv2d(32, 64, 4, stride=2)),
+        #     nn.ReLU(),
+        #     self._init_layer(nn.Conv2d(64, 64, 3, stride=1)),
+        #     nn.ReLU(),
+        #     nn.Flatten(),
+        #     self._init_layer(nn.Linear(64 * 7 * 7, 512)),
+        #     nn.ReLU(),
+        #     self._init_layer(nn.Linear(512, self.output_size), weight_std=0.01),
+        # )
 
     def get_action_logits(self, observation: Tensor) -> Tensor:
         return self.network(observation)
@@ -155,7 +155,7 @@ class PolicyCharacteristic(nn.Module):
         val_loader = DataLoader(val_data, batch_size=64, shuffle=False)
         val_masks = [torch.rand(obs.shape) < 0.5 for obs, _ in val_loader]
         
-        EPOCHS = 200
+        EPOCHS = 500
         obs = torch.tensor(envs.reset()[0]).to(device).double()
         for epoch in range(1 + self.epochs_completed, EPOCHS + 1):
             print(f"EPOCH {epoch}")

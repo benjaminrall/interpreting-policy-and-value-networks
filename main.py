@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 import gymnasium as gym
 from gymnasium.vector import VectorEnv
-from ppo.config import Config
+from ppo.config import PPOConfig
 from ppo.ppo_agent import PPOAgent
 from ppo.continuous_ppo_agent import ContinuousPPOAgent
 from ppo.atari_ppo_agent import AtariPPOAgent
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Loads the config from the specified yaml file
-    cfg = Config.from_yaml(args.config_file)
+    cfg = PPOConfig.from_yaml(args.config_file)
 
     # Sets random seeds to ensure run is deterministic
     random.seed(cfg.seed)

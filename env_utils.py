@@ -66,9 +66,9 @@ class RecordAtariVideo(gym.wrappers.RecordVideo):
                     'MoviePy is not installed, run `pip install "gymnasium[other]"`'
                 ) from e
 
-            clip = ImageSequenceClip(self.recorded_frames, fps=self.frames_per_sec)
-            moviepy_logger = None if self.disable_logger else "bar"
-            path = os.path.join(self.video_folder, f"{self._video_name}.mp4")
+            # clip = ImageSequenceClip(self.recorded_frames, fps=self.frames_per_sec)
+            # moviepy_logger = None if self.disable_logger else "bar"
+            # path = os.path.join(self.video_folder, f"{self._video_name}.mp4")
             # clip.write_videofile(path, logger=moviepy_logger)
             # print(np.array(self.recorded_frames).shape)
             wandb.log({'videos': wandb.Video(np.transpose(self.recorded_frames, (0, 3, 1, 2)), fps=self.frames_per_sec)})
