@@ -1,0 +1,10 @@
+run_name: 'breakout-ppo-pc'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: PolicyCharacteristic
+  model: LargeAtariPC
+  masking: ZeroMasking
+  data: ProceduralData
+  agent_path: models/breakout/ppo

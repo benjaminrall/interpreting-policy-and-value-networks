@@ -1,0 +1,19 @@
+run_name: 'breakout-ppo'
+seed: 42
+checkpoint_interval: 200
+
+agent:
+  type: PPO
+  actor: AtariActor
+  critic: AtariCritic
+  learning_rate: 0.000025
+  total_timesteps: 40000000
+  n_steps: 128
+  clip_coefficient: 0.1
+  
+  environment:
+    type: Atari
+    name: BreakoutNoFrameskip-v4
+    num_envs: 8
+    record: True
+    record_interval: 10
