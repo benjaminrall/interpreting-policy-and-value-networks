@@ -79,3 +79,7 @@ class Model(ABC, nn.Module):
         if state_dict:
             model.load_state_dict(state_dict)
         return model
+
+    @classmethod
+    def from_name(cls, name: str):
+        return cls.from_dict({'name': name})
