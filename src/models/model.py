@@ -59,7 +59,7 @@ class Model(ABC, nn.Module):
         return model_dict
 
     @classmethod
-    def from_dict(cls, model_dict: dict):
+    def from_dict(cls, model_dict: dict) -> 'Model':
         """Instantiates a registered model from a model dict."""
         # Gets the name and state dict from the model dict
         name = model_dict.get('name')
@@ -81,5 +81,5 @@ class Model(ABC, nn.Module):
         return model
 
     @classmethod
-    def from_name(cls, name: str):
-        return cls.from_dict({'name': name})
+    def from_name(cls, name: str, **kwargs) -> 'Model':
+        return cls.from_dict({'name': name, 'kwargs': kwargs})

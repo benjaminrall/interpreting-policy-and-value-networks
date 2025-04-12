@@ -8,8 +8,9 @@ from stable_baselines3.common.atari_wrappers import (
 )
 from src.configs import EnvConfig
 from src.env_builders import EnvBuilder
-from src.utils import RecordAtariVideo
+from src.utils.wrappers import RecordAtariVideo, ScalePixelObservations
 import ale_py
+
 
 class AtariEnvBuilder(EnvBuilder):
     """Class to build Atari environments."""
@@ -39,6 +40,7 @@ class AtariEnvBuilder(EnvBuilder):
                 gym.wrappers.GrayscaleObservation,
                 lambda envs: gym.wrappers.ResizeObservation(envs, (84, 84)),
                 lambda envs: gym.wrappers.FrameStackObservation(envs, 4),
+                ScalePixelObservations
             ]
         )
 
