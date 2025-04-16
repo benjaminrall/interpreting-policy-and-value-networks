@@ -1,0 +1,11 @@
+run_name: 'breakout-ppo-ps-1'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Shapley
+  model: StandardAtari
+  target: actor
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppo.pt
+  characteristic_checkpoint: checkpoints/breakout-ppo-pc-2b-1744757310/200.pt

@@ -16,7 +16,6 @@ class TrainerConfig:
             track_wandb: bool = True,
             wandb_project: str = 'Year 3 Project',
             wandb_entity: str = None,
-            wandb_id: str = None,
             **kwargs
             ) -> None:
         # Stores given arguments
@@ -28,7 +27,6 @@ class TrainerConfig:
         self.track_wandb = track_wandb
         self.wandb_project = wandb_project
         self.wandb_entity = wandb_entity
-        self.wandb_id = wandb_id
 
         # Gets the object config and type from remaining kwargs
         self.kwargs_type = None
@@ -47,12 +45,12 @@ class TrainerConfig:
             'track_wandb': self.track_wandb,
             'wandb_project': self.wandb_project,
             'wandb_entity': self.wandb_entity,
-            'wandb_id': self.wandb_id,
         }
-        objective_dict = { 
-            self.kwargs_type: asdict(self.objective_config) 
-        }
-        trainer_dict.update(objective_dict if include_objective else {})
+        if include_objective:
+            objective_dict = { 
+                self.kwargs_type: asdict(self.objective_config) 
+            }
+            trainer_dict.update(objective_dict)
         return trainer_dict
 
     def _get_objective_config(self, **kwargs) -> TrainableConfig:

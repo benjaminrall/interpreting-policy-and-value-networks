@@ -1,0 +1,2 @@
+from .standard_atari import ShapleyStandardAtari
+from .large_atari import ShapleyLargeAtari

@@ -4,7 +4,6 @@ from torch.types import Tensor
 from torch.utils.tensorboard.writer import SummaryWriter
 from src.agents import Agent
 from src.utils import get_device
-from dataclasses import asdict
 from tqdm import tqdm
 
 from typing import TYPE_CHECKING
@@ -13,12 +12,14 @@ if TYPE_CHECKING:
     from src import Trainer
 
 class PPO(Agent):
-    """PPO agent"""
+    """PPO agent."""
     
     def __init__(self, cfg: 'PPOConfig', state: dict = None):
         super().__init__(cfg, state)
         self.cfg = cfg
-        
+        self.device = get_device()
+        self.to(self.device)
+
         # Initialises the Adam optimiser for PPO
         self.optimiser = Adam(self.parameters(), lr=cfg.learning_rate, eps=cfg.adam_eps)
         
@@ -35,6 +36,8 @@ class PPO(Agent):
     def get_state_dict(self):
         state_dict = super().get_state_dict()
         state_dict['optimiser'] = self.optimiser.state_dict()
+        state_dict['global_step'] = self.global_step
+        state_dict['updates_completed'] = self.updates_completed
         return state_dict
 
     def anneal_lr(self, update: int, total_updates: int) -> None:
@@ -47,12 +50,11 @@ class PPO(Agent):
         next_obs: Tensor,
         next_done: Tensor,
         storage: dict[str, Tensor],        
-        device: torch.device
     ) -> tuple[Tensor, Tensor]:
         """Performs generalised advantage estimation."""
         with torch.no_grad():
             # Variables to store the advantages for each environment and the previous lambda value
-            advantages = torch.zeros_like(storage['rewards']).to(device)
+            advantages = torch.zeros_like(storage['rewards']).to(self.device)
             last_lambda = 0
 
             # Initial values assuming continuation from the last step in the current batch
@@ -76,16 +78,16 @@ class PPO(Agent):
         return advantages, returns
 
     
-    def init_data_store(self, device: torch.device) -> dict[str, Tensor]:
+    def init_data_store(self) -> dict[str, Tensor]:
         """Initialises the data store used to store all required results from policy rollout."""
         batch_shape = (self.cfg.n_steps, self.cfg.environment.num_envs)
         return {
-            'observations': torch.zeros(batch_shape + self.envs.single_observation_space.shape).to(device).double(),
-            'actions': torch.zeros(batch_shape + self.envs.single_action_space.shape).to(device).double(),
-            'log_probs': torch.zeros(batch_shape).to(device).double(),
-            'rewards': torch.zeros(batch_shape).to(device).double(),
-            'dones': torch.zeros(batch_shape).to(device).double(),
-            'values': torch.zeros(batch_shape).to(device).double(),
+            'observations': torch.zeros(batch_shape + self.envs.single_observation_space.shape).to(self.device),
+            'actions': torch.zeros(batch_shape + self.envs.single_action_space.shape).to(self.device),
+            'log_probs': torch.zeros(batch_shape).to(self.device),
+            'rewards': torch.zeros(batch_shape).to(self.device),
+            'dones': torch.zeros(batch_shape).to(self.device),
+            'values': torch.zeros(batch_shape).to(self.device),
         }
     
 
@@ -111,8 +113,6 @@ class PPO(Agent):
         next_obs: Tensor,
         next_done: Tensor,
         storage: dict[str, Tensor],
-        global_step: int,
-        device: torch.device,
         trainer: 'Trainer',
     ) -> tuple[Tensor, Tensor, int]:
         """
@@ -129,8 +129,6 @@ class PPO(Agent):
             Dictionary to store rollout outputs.
         global_step : int
             Current global step number for metrics tracking.
-        device : torch.device
-            Device to use for torch. 
         trainer : Trainer
             Trainer for tracking metrics.
 
@@ -145,7 +143,7 @@ class PPO(Agent):
         # Iterates each environment for the number of steps specified in the config
         for step in range(self.cfg.n_steps):
             # Increment global steps per environment and store the current observation
-            global_step += self.cfg.environment.num_envs
+            self.global_step += self.cfg.environment.num_envs
             storage['observations'][step] = next_obs
             storage['dones'][step] = next_done
 
@@ -158,9 +156,9 @@ class PPO(Agent):
 
             # Step the environments using the sampled actions, and store their results
             next_obs, reward, terminate, truncate, info = self.envs.step(action.cpu().numpy())
-            storage['rewards'][step] = torch.tensor(reward).to(device).view(-1)
-            next_obs = torch.tensor(next_obs).to(device).double()
-            next_done = (torch.tensor(terminate + truncate) > 0).type(torch.int32).to(device)
+            storage['rewards'][step] = torch.tensor(reward).to(self.device).view(-1)
+            next_obs = torch.tensor(next_obs).to(self.device)
+            next_done = (torch.tensor(terminate + truncate) > 0).type(torch.int32).to(self.device)
 
             # If an environment finished, log its stats to Tensorboard
             if next_done.any():
@@ -169,29 +167,27 @@ class PPO(Agent):
                         trainer.log(
                             'charts/episodic_return',
                             info['episode']['r'][i],
-                            global_step
+                            self.global_step
                         )
                         trainer.log(
                             'charts/episodic_length',
                             info['episode']['l'][i],
-                            global_step,
+                            self.global_step,
                         )
                 
-        return next_obs, next_done, global_step
+        return next_obs, next_done
     
 
     def optimise(
         self,
         batch_data: dict[str, Tensor],
-        global_step: int,
-        device: torch.device,
         trainer: 'Trainer'
     ) -> None:
         """Optimises the agent's networks based on a given set of complete batch data."""
         # Loops for each update epoch
         for epoch in range(self.cfg.update_epochs):
             # Randomly shuffles batch indices
-            batch_idx = torch.randperm(self.cfg.batch_size).to(device)
+            batch_idx = torch.randperm(self.cfg.batch_size).to(self.device)
 
             # Processes and updates the agent for each mini-batch
             for start in range(0, self.cfg.batch_size, self.cfg.minibatch_size):
@@ -221,7 +217,7 @@ class PPO(Agent):
                 policy_loss = torch.min(unclipped_policy_loss, clipped_policy_loss).mean()
 
                 # Calculates value loss using MSE
-                value_loss = ((new_values.view(-1) - returns) ** 2.0).mean()
+                value_loss = 0.5 * ((new_values.view(-1) - returns) ** 2.0).mean()
 
                 # Calculates entropy loss, which should be maximised to encourage exploration
                 entropy_loss = entropy.mean()
@@ -240,25 +236,20 @@ class PPO(Agent):
                 self.optimiser.step()
 
         # Adds tracked values to the Tensorboard writer
-        trainer.log('charts/learning_rate', self.optimiser.param_groups[0]['lr'], global_step)
-        trainer.log('losses/policy_loss', policy_loss.item(), global_step)
-        trainer.log('losses/value_loss', value_loss.item(), global_step)
-        trainer.log('losses/entropy_loss', entropy_loss.item(), global_step)
-        trainer.log('losses/combined_loss', loss.item(), global_step)
+        trainer.log('charts/learning_rate', self.optimiser.param_groups[0]['lr'], self.global_step)
+        trainer.log('losses/policy_loss', policy_loss.item(), self.global_step)
+        trainer.log('losses/value_loss', value_loss.item(), self.global_step)
+        trainer.log('losses/entropy_loss', entropy_loss.item(), self.global_step)
+        trainer.log('losses/combined_loss', loss.item(), self.global_step)
 
 
     def train(self, trainer: 'Trainer') -> None:
-        # Gets the device to use with torch
-        device = get_device()
-
-        self.to(device).double()
-
         # Initialises the data store used to track all relevant values during training
-        storage = self.init_data_store(device)
+        storage = self.init_data_store()
 
         # Tensors to keep track of the current state and termination criteria during training 
-        next_obs = torch.tensor(self.envs.reset(seed=trainer.cfg.seed)[0]).to(device).double()
-        next_done = torch.zeros(self.cfg.environment.num_envs).to(device)
+        next_obs = torch.tensor(self.envs.reset(seed=trainer.cfg.seed)[0]).to(self.device)
+        next_done = torch.zeros(self.cfg.environment.num_envs).to(self.device)
 
         # Extra values for tracking run performance and performing learning rate annealing etc.
         total_updates = self.cfg.total_timesteps // self.cfg.batch_size
@@ -270,21 +261,19 @@ class PPO(Agent):
                 self.anneal_lr(update, total_updates)
 
             # Performs policy rollout on the environments
-            next_obs, next_done, self.global_step = self.policy_rollout(
+            next_obs, next_done = self.policy_rollout(
                 next_obs,
                 next_done,
                 storage,
-                self.global_step,
-                device,
                 trainer,
             )
 
             # Performs generalised advantage estimation and flattens this rollout's data into a batch
-            advantages, returns = self.compute_gae(next_obs, next_done, storage, device)
+            advantages, returns = self.compute_gae(next_obs, next_done, storage)
             batch_data = self.get_batch_data(advantages, returns, storage)
 
             # Optimises the agent based on this collected data
-            self.optimise(batch_data, self.global_step, device, trainer)
+            self.optimise(batch_data, trainer)
 
             # Saves checkpoints of the agent
             self.updates_completed += 1

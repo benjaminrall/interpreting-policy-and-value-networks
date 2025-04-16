@@ -23,7 +23,7 @@ class Trainable(ABC, nn.Module):
     def load(cls, path: str) -> 'Trainable':
         """Loads a trainable model from the specified path."""
         return cls.from_dict(torch.load(path, weights_only=False))
-
+    
     def to_dict(self) -> dict:
         """Serialises a trainable model to a dictionary."""
         return {
@@ -38,6 +38,15 @@ class Trainable(ABC, nn.Module):
     def from_dict(d: dict) -> 'Trainable':
         """Deserialises a trainable model from a dictionary."""
         return d['type'](**d['params'])
+
+    @staticmethod
+    def load_checkpoint(path: str) -> 'Trainable':
+        """Loads a trainable object from a trainer checkpoint with the specified path."""
+        # Loads the checkpoint dictionary from the path
+        checkpoint = torch.load(path, weights_only=False)
+
+        # Gets the trainable objective from the objective dictionary
+        return Trainable.from_dict(checkpoint['objective'])
 
     @abstractmethod
     def get_state_dict(self) -> dict:

@@ -1,0 +1,12 @@
+run_name: 'breakout-ppo-vc-5'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: LargeAtari
+  target: critic
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppo.pt
+  masker: ConstantMasker
+  mask_value: -1

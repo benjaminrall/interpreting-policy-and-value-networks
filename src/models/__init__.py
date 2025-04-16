@@ -1,4 +1,4 @@
 from .model import Model
 
-from . import ppo
+from . import agent
 from . import sverl

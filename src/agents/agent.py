@@ -14,6 +14,7 @@ class Agent(Trainable):
 
     def __init__(self, cfg: 'AgentConfig', state: dict = None) -> None:
         super().__init__(cfg, state)
+        self.cfg = cfg
 
         # Builds the environments from the env config
         self.envs = EnvBuilder.build(cfg.environment)
@@ -33,7 +34,6 @@ class Agent(Trainable):
         state_dict['actor'] = self.actor.state_dict()
         state_dict['critic'] = self.critic.state_dict()
         return state_dict
-
 
     def get_action(self, observation: Tensor) -> Tensor:
         """Returns a sampled action from the actor given an observation."""
@@ -80,7 +80,3 @@ class Agent(Trainable):
 
         # Returns the tuple of action details and value
         return action, probs.log_prob(action), probs.entropy(), self.critic(observation)
-
-    def __del__(self) -> None:
-        """Ensures the environments are closed once the agent is finished with."""
-        self.envs.close()

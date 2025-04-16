@@ -3,7 +3,7 @@ from src.configs import EnvConfig, TrainableConfig
 
 @dataclass
 class AgentConfig(TrainableConfig):
-    """Abstract base class for actor-critic agent configurations."""
+    """Base class for actor-critic agent configurations."""
 
     actor: str
     critic: str

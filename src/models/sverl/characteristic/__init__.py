@@ -1,2 +1,3 @@
-from .standard_atari_policy import SVERLStandardAtariPC
-from .large_atari_policy import SVERLLargeAtariPC
+from .standard_atari import CharacteristicStandardAtari
+from .large_atari import CharacteristicLargeAtari
+from .larger_atari import CharacteristicLargerAtari

@@ -18,8 +18,7 @@ class Trainer:
         self.cfg = cfg
         self.trained = False
         self.objective = self.get_objective() if saved_objective is None else saved_objective
-        self.cfg.wandb_id = self.cfg.wandb_id if self.cfg.wandb_id is not None else str(int(time.time()))
-        self.run_name = f"{self.cfg.run_name}-{self.cfg.wandb_id}"
+        self.run_name = f"{self.cfg.run_name}-{int(time.time())}"
 
     @classmethod
     def from_yaml(cls, file: TextIOWrapper) -> 'Trainer':
@@ -78,7 +77,7 @@ class Trainer:
         objective = self.cfg.objective_type(self.cfg.objective_config)
         return objective
 
-    def log(self, tag: str, value, global_step: int) -> None:
+    def log(self, tag: str, value, global_step: int = None) -> None:
         """Logs the given value to Tensorboard as a scalar."""
         self.writer.add_scalar(tag, value, global_step)
 
@@ -101,7 +100,6 @@ class Trainer:
             self.run = wandb.init(
                 project=self.cfg.wandb_project,
                 entity=self.cfg.wandb_entity,
-                id=self.cfg.wandb_id,
                 sync_tensorboard=True,
                 name=self.run_name,
                 config=to_nested_dict(self.cfg),
@@ -114,7 +112,3 @@ class Trainer:
         self._reset_seed()
         self.objective.train(self)
 
-    def __del__(self) -> None:
-        """Ensures the W&B run is closed once the trainer is finished with."""
-        if self.trained and self.cfg.track_wandb:
-            self.run.finish()

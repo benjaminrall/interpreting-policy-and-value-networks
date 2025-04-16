@@ -18,9 +18,7 @@ def get_device() -> torch.device:
     
 def to_nested_dict(obj) -> dict:
     """Recursively converts an object and its nested objects into a dictionary."""
-    if hasattr(obj, "to_dict"):
-        return to_nested_dict(obj.to_dict())
-    elif isinstance(obj, dict):
+    if isinstance(obj, dict):
         return {k: to_nested_dict(v) for k, v in obj.items()}
     elif hasattr(obj, "__dict__"):
         return {
