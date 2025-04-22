@@ -18,7 +18,12 @@ class Trainer:
         self.cfg = cfg
         self.trained = False
         self.objective = self.get_objective() if saved_objective is None else saved_objective
-        self.run_name = f"{self.cfg.run_name}-{int(time.time())}"
+        if cfg.run_id == "auto":
+            self.run_name = f"{self.cfg.run_name}-{int(time.time())}"
+        elif cfg.run_id == "":
+            self.run_name = self.cfg.run_name
+        else:
+            self.run_name = f"{self.cfg.run_name}-{self.cfg.run_id}"
 
     @classmethod
     def from_yaml(cls, file: TextIOWrapper) -> 'Trainer':

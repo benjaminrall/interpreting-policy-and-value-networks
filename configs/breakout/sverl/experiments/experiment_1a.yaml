@@ -1,0 +1,14 @@
+run_name: 'Breakout PPO PC Mask Scaling'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: StandardAtari
+  target: actor
+  epochs: 400
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppo.pt
+  masker: ConstantMasker
+  mask_kwargs:
+    value: -1

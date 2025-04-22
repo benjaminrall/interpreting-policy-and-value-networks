@@ -8,6 +8,7 @@ from tqdm import tqdm
 from src.sverl.masking import Masker
 from src.sverl import Characteristic
 from src import Trainable
+import numpy as np
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -28,7 +29,7 @@ class Shapley(SVERLFunction):
 
         # Initialises the Adam optimiser and learning rate schedular
         self.optimiser = Adam(self.parameters(), lr=cfg.learning_rate)
-        self.scheduler = ReduceLROnPlateau(self.optimiser, mode='min', factor=0.8, patience=5)
+        self.scheduler = ReduceLROnPlateau(self.optimiser, mode='min', factor=cfg.anneal_factor, patience=cfg.anneal_patience)
 
         # Initialises training tracking params
         self.epochs_completed = 0
@@ -46,14 +47,36 @@ class Shapley(SVERLFunction):
         state_dict['epochs_completed'] = self.epochs_completed
         return state_dict
     
+    def infer(self, x: Tensor) -> Tensor:
+        with torch.no_grad():
+            # Gets the target function output
+            target_output = self.target(x)
+            if self.cfg.target == 'actor':
+                target_output = torch.softmax(target_output, dim=-1)
+
+            # Gets the characteristic function output
+            masked = self.characteristic.masker.masked_like(x)
+            cf_output = self.characteristic.infer(masked)
+
+            # Calculates the contributions of each pixel from the shapley model
+            contributions = self.model(x)
+            dim = tuple(range(1, masked.dim() - 1))
+            contribution_sum = torch.sum(contributions, dim=dim)
+
+            # Calculates the normalisation factor to apply to all contributions for the state
+            norm_factor = (1 / np.prod(x.shape[1:])) * (target_output - cf_output - contribution_sum)
+            
+        return contributions + norm_factor
+    
     def train(self, trainer: 'Trainer'):
-        val_samples, val_masks = self.generate_validation_data()
+        # Generates the validation data for tracking the training run
+        val_xs, val_masks = self.generate_validation_data()
 
         for epoch in tqdm(range(1 + self.epochs_completed, self.cfg.epochs + 1), initial=self.epochs_completed, total=self.cfg.epochs):
             # Gets state samples for the current epoch
             samples = self.state_sampler.sample(self.cfg.samples_per_epoch, self.cfg.batch_size)
 
-            for i, (x, _) in enumerate(samples):
+            for i, x in enumerate(samples):
                 # Generates the random mask for this batch
                 mask = torch.rand(x.shape) < 0.5
 
@@ -71,6 +94,12 @@ class Shapley(SVERLFunction):
                 dim = tuple(range(1, masked_results.dim() - 1))
                 part_3 = masked_results.sum(dim=dim)
 
+                # EXPERIMENT 3
+                # action = i % 4
+                # part_1_a = part_1[..., action]
+                # part_2_a = part_2[..., action]
+                # part_3_a = part_3[..., action]
+
                 # Calculates MSE loss
                 loss = torch.square(part_1 - part_2 - part_3).mean()
 
@@ -84,7 +113,7 @@ class Shapley(SVERLFunction):
 
             # Measures validation loss
             total_loss = 0
-            for i, (x, _) in enumerate(val_samples):
+            for i, x in enumerate(val_xs):
                 # Applies the mask to the state observation
                 mask = val_masks[i]
                 self.characteristic.masker.mask(x, mask)

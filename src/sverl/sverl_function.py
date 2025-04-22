@@ -4,6 +4,7 @@ from src.models.model import Model
 from src.sverl.state_samplers import StateSampler
 from torch.types import Tensor
 import torch
+from torch.utils.data import DataLoader
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -34,9 +35,9 @@ class SVERLFunction(Trainable):
             self.model.load_state_dict(state['model'])
 
     def generate_validation_data(self) -> None:
-        samples = self.validation_sampler.sample(self.cfg.validation_samples, self.cfg.validation_batch_size, shuffle=False)
-        masks = [torch.rand(x.shape) < 0.5 for x, _ in samples]
-        return samples, masks
+        xs = self.validation_sampler.sample(self.cfg.validation_samples, self.cfg.validation_batch_size, shuffle=False)
+        masks = [torch.rand(x.shape) < 0.5 for x in xs]
+        return xs, masks
 
     def get_state_dict(self):
         state_dict = super().get_state_dict()

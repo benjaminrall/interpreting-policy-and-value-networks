@@ -23,11 +23,11 @@ class StateSampler(ABC):
             raise ValueError(f'Unknown state sampler type: {name}')
         return cls._registry[name](**kwargs)
     
-    def setup(self, **kwargs) -> None:
+    def setup(self, **_) -> None:
         """Sets up the state sampler for sampling."""
         pass
 
     @abstractmethod
-    def sample(self, n: int, batch_size: int = 64, shuffle: bool = True) -> list[Tensor]:
+    def sample(self, n: int, batch_size: int = 64, shuffle: bool = True) -> Tensor:
         """Samples `n` states from the sampler, in optionally shuffled mini batches."""
         pass

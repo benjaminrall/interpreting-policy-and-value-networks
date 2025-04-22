@@ -17,6 +17,8 @@ class SVERLConfig(TrainableConfig):
     samples_per_epoch: int = 10000
     learning_rate: float = 0.001
     anneal_lr: bool = True
+    anneal_factor: float = 0.8
+    anneal_patience: int = 5
 
     _registry = {}
 

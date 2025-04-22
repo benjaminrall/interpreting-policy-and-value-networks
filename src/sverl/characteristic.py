@@ -28,7 +28,7 @@ class Characteristic(SVERLFunction):
 
         # Initialises the Adam optimiser and learning rate schedular
         self.optimiser = Adam(self.parameters(), lr=cfg.learning_rate)
-        self.scheduler = ReduceLROnPlateau(self.optimiser, mode='min', factor=0.8, patience=5)
+        self.scheduler = ReduceLROnPlateau(self.optimiser, mode='min', factor=cfg.anneal_factor, patience=cfg.anneal_patience)
 
         # Initialises training tracking params
         self.epochs_completed = 0
@@ -54,13 +54,23 @@ class Characteristic(SVERLFunction):
         return predictions
 
     def train(self, trainer: 'Trainer'):
-        val_samples, val_masks = self.generate_validation_data()
+        # Generates the validation data for tracking the training run
+        val_xs, val_masks = self.generate_validation_data()
+        with torch.no_grad():
+            val_ys = [self.target(x) for x in val_xs]
 
         for epoch in tqdm(range(1 + self.epochs_completed, self.cfg.epochs + 1), initial=self.epochs_completed, total=self.cfg.epochs):
             # Gets state samples for the current epoch
             samples = self.state_sampler.sample(self.cfg.samples_per_epoch, self.cfg.batch_size)
 
-            for i, (x, y) in enumerate(samples):
+            # EXPERIMENT 1
+            # p = min(0.5, epoch / self.cfg.epochs)
+
+            for i, x in enumerate(samples):
+                # Gets actual output from the target network
+                with torch.no_grad():
+                    y = self.target(x)
+
                 # Generates the random mask for this batch
                 mask = torch.rand(x.shape) < 0.5
 
@@ -69,6 +79,11 @@ class Characteristic(SVERLFunction):
 
                 # Gets masked output from the characteristic model
                 predictions = self.model(x)
+
+                # EXPERIMENT 3
+                # action = i % 4
+                # y_a = y[..., action]
+                # pred_a = predictions[..., action]
 
                 # Calculates MSE loss
                 loss = torch.square(y - predictions).mean()
@@ -83,7 +98,7 @@ class Characteristic(SVERLFunction):
 
             # Measures validation loss
             total_loss = 0
-            for i, (x, y) in enumerate(val_samples):
+            for i, (x, y) in enumerate(zip(val_xs, val_ys)):
                 self.masker.mask(x, val_masks[i])
                 with torch.no_grad():
                     predictions = self.model(x)

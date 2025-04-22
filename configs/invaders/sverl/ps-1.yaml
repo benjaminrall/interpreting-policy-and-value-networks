@@ -1,0 +1,11 @@
+run_name: 'invaders-ppo-ps-final-1'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Shapley
+  model: StandardAtari
+  target: actor
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/invaders/ppo.pt
+  characteristic_checkpoint: checkpoints/invaders-ppo-pc-final-1/400.pt

@@ -1,0 +1,11 @@
+run_name: 'breakout-ppo-pc-3LL'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: LargerAtari
+  target: actor
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppo.pt
+  masker: NoiseMasker

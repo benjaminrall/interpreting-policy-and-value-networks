@@ -78,13 +78,17 @@ if __name__ == '__main__':
                         'render': render,
                         'state': obs.cpu().numpy(),
                     }
-                    torch.save(test_save, f"data/test/breakout/{int(time.time())}")
+                    torch.save(test_save, f"data/test/invaders/{int(time.time())}")
                     
         if playing or stepping:
             action = agent.get_action(obs)
-            next_obs, reward, terminate, truncate, info = envs.step(action.cpu().numpy())
+            a = action.cpu().numpy()
+            next_obs, reward, terminate, truncate, info = envs.step(a)
             obs = torch.tensor(next_obs).to(device)
             done = terminate and truncate
+
+        print(0.5 in obs, obs.mean(), obs.mean() in obs)
+
         stepping = False
         render = np.swapaxes(envs.unwrapped.render()[0], 0, 1)
         pygame.surfarray.blit_array(surface, cv2.resize(render, (WIN_HEIGHT, WIN_WIDTH), cv2.INTER_NEAREST))

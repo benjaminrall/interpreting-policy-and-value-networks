@@ -9,6 +9,7 @@ class TrainerConfig:
     def __init__(
             self, 
             run_name: str, 
+            run_id: str = "",
             seed: int = 42,
             save_checkpoints: bool = True,
             checkpoint_interval: int = 1,
@@ -20,6 +21,7 @@ class TrainerConfig:
             ) -> None:
         # Stores given arguments
         self.run_name = run_name
+        self.run_id = run_id
         self.seed = seed
         self.save_checkpoints = save_checkpoints
         self.checkpoint_interval = checkpoint_interval

@@ -1,0 +1,12 @@
+run_name: 'Breakout PPO PS Separated Actions'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Shapley
+  model: StandardAtari
+  target: actor
+  epochs: 800
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppo.pt
+  characteristic_checkpoint: checkpoints/Breakout PPO PC Mask Scaling-1744856168/800.pt

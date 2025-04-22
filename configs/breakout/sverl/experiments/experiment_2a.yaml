@@ -1,0 +1,16 @@
+run_name: 'Breakout PPO PC Less Annealing'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: StandardAtari
+  target: actor
+  epochs: 600
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppo.pt
+  masker: ConstantMasker
+  anneal_patience: 20
+  learning_rate: 0.003
+  mask_kwargs:
+    value: -1
