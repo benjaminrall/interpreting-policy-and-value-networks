@@ -24,7 +24,7 @@ class SVERLFunction(Trainable):
         self.target = self.agent.actor if cfg.target == 'actor' else self.agent.critic
 
         # Builds the function's model
-        self.model = Model.from_name(cfg.type + cfg.model, output_size=self.target.model[-1].out_features)
+        self.model = Model.from_name(cfg.type + cfg.model, output_size=self.target.output_size)
 
         # Gets the state sampler for model training and validation
         self.state_sampler = StateSampler.from_name(cfg.state_sampler, agent=self.agent, target=self.target)

@@ -1,0 +1,20 @@
+run_name: "invaders-ppg"
+seed: 42
+checkpoint_interval: 25
+track_wandb: true
+
+agent:
+  type: PPG
+  actor: AtariActor
+  critic: AtariCritic
+
+  learning_rate: 0.00025
+  total_timesteps: 10000000
+  clip_coefficient: 0.1
+
+  environment:
+    type: Atari
+    name: SpaceInvadersNoFrameskip-v4
+    num_envs: 8
+    record: True
+    record_interval: 200

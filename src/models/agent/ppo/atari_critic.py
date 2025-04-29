@@ -5,6 +5,7 @@ class PPOAtariCritic(Model):
     """PPO critic model for use in Atari environments."""
     
     def _construct_model(self) -> nn.Module:
+        self.output_size = 1
         model = nn.Sequential(
             self._init_layer(nn.Conv2d(4, 32, 8, stride=4)),
             nn.ReLU(),

@@ -1,0 +1,11 @@
+run_name: 'breakout-ppg-vc-final-2'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: StandardAtari
+  target: critic
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppg.pt
+  masker: MeanMasker

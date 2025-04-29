@@ -63,6 +63,9 @@ class Characteristic(SVERLFunction):
             # Gets state samples for the current epoch
             samples = self.state_sampler.sample(self.cfg.samples_per_epoch, self.cfg.batch_size)
 
+            # EXPERIMENT 4
+            # samples = self.state_sampler.sample(320, 1)
+
             # EXPERIMENT 1
             # p = min(0.5, epoch / self.cfg.epochs)
 
@@ -70,6 +73,9 @@ class Characteristic(SVERLFunction):
                 # Gets actual output from the target network
                 with torch.no_grad():
                     y = self.target(x)
+
+                # EXPERIMENT 4
+                # x = x.repeat(64, *([1] * (x.dim() - 1)))
 
                 # Generates the random mask for this batch
                 mask = torch.rand(x.shape) < 0.5
@@ -84,6 +90,9 @@ class Characteristic(SVERLFunction):
                 # action = i % 4
                 # y_a = y[..., action]
                 # pred_a = predictions[..., action]
+                
+                # EXPERIMENT 4
+                # y = y.repeat(64, *([1] * (y.dim() - 1)))
 
                 # Calculates MSE loss
                 loss = torch.square(y - predictions).mean()

@@ -1,0 +1,11 @@
+run_name: 'breakout-ppg-vs-final-3'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Shapley
+  model: StandardAtari
+  target: critic
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppg.pt
+  characteristic_checkpoint: checkpoints/breakout-ppg-vc-final-3/400.pt

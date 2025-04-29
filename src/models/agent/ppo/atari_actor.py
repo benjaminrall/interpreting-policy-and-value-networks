@@ -5,6 +5,7 @@ class PPOAtariActor(Model):
     """PPO actor model for use in Atari environments."""
 
     def _construct_model(self, output_size) -> nn.Module:
+        self.output_size = output_size
         model = nn.Sequential(
             self._init_layer(nn.Conv2d(4, 32, 8, stride=4)),
             nn.ReLU(),

@@ -1,7 +1,11 @@
 from src import Trainer
 import argparse
+import wandb
 
 if __name__ == '__main__':
+
+    wandb.login(key='fde56b5f00cdbd73fda76d359e6eb51a5d9f3fcf')
+
     # Reads command line argument for the config file path or checkpoint path
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)

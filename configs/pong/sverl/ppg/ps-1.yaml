@@ -1,0 +1,11 @@
+run_name: 'pong-ppg-ps-final-1'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Shapley
+  model: StandardAtari
+  target: actor
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/pong/ppg.pt
+  characteristic_checkpoint: checkpoints/pong-ppg-pc-final-1/400.pt

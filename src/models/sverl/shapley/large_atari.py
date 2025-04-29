@@ -30,7 +30,6 @@ class ShapleyLargeAtari(Model):
         self.upsample_3 = nn.ConvTranspose2d(128, 64, 2, stride=2)
         self.up_3 = conv_block(128, 64)
         self.final = nn.Conv2d(64, 4 * output_size, 1)
-        return None
     
     def forward(self, x):
         batch_size = x.shape[0]

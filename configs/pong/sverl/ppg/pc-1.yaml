@@ -1,0 +1,13 @@
+run_name: 'pong-ppg-pc-final-1'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: StandardAtari
+  target: actor
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/pong/ppg.pt
+  masker: ConstantMasker
+  mask_kwargs:
+    value: -0.5
