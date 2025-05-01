@@ -1,0 +1,12 @@
+run_name: 'mastermind-ps-3'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Shapley
+  model: StandardSimple
+  target: actor
+  learning_rate: 0.01
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/testing/mastermind.pt
+  characteristic_checkpoint: checkpoints/mastermind-pc-3/50.pt

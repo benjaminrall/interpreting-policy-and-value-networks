@@ -1,0 +1,15 @@
+run_name: 'Breakout PPO PC Cross-entropy'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: StandardAtari
+  target: actor
+  epochs: 400
+  learning_rate: 0.003
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/breakout/ppo.pt
+  masker: ConstantMasker
+  mask_kwargs:
+    value: -1

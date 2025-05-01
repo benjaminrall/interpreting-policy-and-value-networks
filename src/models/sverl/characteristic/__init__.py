@@ -1,3 +1,4 @@
 from .standard_atari import CharacteristicStandardAtari
 from .large_atari import CharacteristicLargeAtari
 from .larger_atari import CharacteristicLargerAtari
+from .standard_simple import CharacteristicStandardSimple

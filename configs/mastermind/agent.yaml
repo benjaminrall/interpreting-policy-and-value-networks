@@ -1,0 +1,14 @@
+run_name: "mastermind"
+seed: 42
+checkpoint_interval: 100000
+track_wandb: false
+
+agent:
+  type: QLearning
+  actor: SimpleActor
+  critic: SimpleCritic
+  total_timesteps: 100000
+  environment:
+    type: Simple
+    name: Mastermind-v0
+    num_envs: 1

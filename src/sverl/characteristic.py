@@ -86,16 +86,24 @@ class Characteristic(SVERLFunction):
                 # Gets masked output from the characteristic model
                 predictions = self.model(x)
 
+                # print(y, predictions)
+
                 # EXPERIMENT 3
                 # action = i % 4
-                # y_a = y[..., action]
-                # pred_a = predictions[..., action]
+                # y = y[..., action]
+                # predictions = predictions[..., action]
                 
                 # EXPERIMENT 4
                 # y = y.repeat(64, *([1] * (y.dim() - 1)))
 
                 # Calculates MSE loss
-                loss = torch.square(y - predictions).mean()
+                # loss = torch.square(y - predictions).mean()
+
+                # EXPERIMENT 5
+                if self.cfg.target == 'actor':
+                    p = torch.softmax(y, dim=-1)
+                    q = torch.softmax(predictions, dim=-1)
+                    loss = -torch.sum(p * torch.log(q + 1e-8), dim=1).mean()
 
                 # Steps the optimiser
                 self.optimiser.zero_grad()

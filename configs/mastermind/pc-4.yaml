@@ -1,0 +1,14 @@
+run_name: 'mastermind-pc-4'
+seed: 42
+checkpoint_interval: 50
+
+sverl:
+  type: Characteristic
+  model: StandardSimple
+  target: actor
+  state_sampler: ProceduralSampler
+  agent_checkpoint: models/testing/mastermind.pt
+  masker: ConstantMasker
+  learning_rate: 0.003
+  mask_kwargs:
+    value: 0.5

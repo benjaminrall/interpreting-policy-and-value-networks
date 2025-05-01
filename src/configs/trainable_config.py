@@ -27,7 +27,6 @@ class TrainableConfig(ABC):
 
         if type is None:
             raise ValueError(f'Trainable dict must contain a `type` field.')
-
         trainable_config = cls.subclass(type)(**trainable_dict)
         return trainable_config
     

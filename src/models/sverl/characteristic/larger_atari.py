@@ -15,8 +15,8 @@ class CharacteristicLargerAtari(Model):
             nn.Flatten(),
             self._init_layer(nn.Linear(256 * 7 * 7, 1024)),
             nn.ReLU(),
-            self._init_layer(nn.Linear(1024, 512)),
+            self._init_layer(nn.Linear(1024, 1024)),
             nn.ReLU(),
-            self._init_layer(nn.Linear(512, output_size), weight_std=0.01),
+            self._init_layer(nn.Linear(1024, output_size), weight_std=0.01),
         )
         return model

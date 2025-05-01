@@ -1,4 +1,4 @@
-run_name: 'breakout-ppg-pc-final-1'
+run_name: 'invaders-ppg-pc-final-1'
 seed: 42
 checkpoint_interval: 50
 
@@ -7,7 +7,7 @@ sverl:
   model: StandardAtari
   target: actor
   state_sampler: ProceduralSampler
-  agent_checkpoint: models/breakout/ppg.pt
+  agent_checkpoint: models/invaders/ppg.pt
   masker: ConstantMasker
   mask_kwargs:
     value: -0.5

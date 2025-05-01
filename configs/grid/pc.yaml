@@ -1,0 +1,14 @@
+run_name: 'grid-pc'
+seed: 42
+checkpoint_interval: 20
+
+sverl:
+  type: Characteristic
+  model: StandardSimple
+  target: actor
+  state_sampler: ProceduralSampler
+  agent_checkpoint: checkpoints/grid/1000000.pt
+  masker: ConstantMasker
+  
+  mask_kwargs:
+    value: -100
