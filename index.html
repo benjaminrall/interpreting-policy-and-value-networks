@@ -1,36 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Agent Videos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .video-columns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 300px;
+      max-width: 480px;
+    }
+
+    h2 {
+      margin-top: 1.5rem;
+      font-size: 1.25rem;
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.25rem;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      background: #000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
 <body>
-  <h1>PPO Agents</h1>
-  <h2>Breakout</h2>
-  <video width="480" controls>
-    <source src="videos/breakout-ppo.mp4" type="video/mp4">
-  </video>
+  <h1>Agent Gameplay Videos</h1>
 
-  <h2>Pong</h2>
-  <video width="480" controls>
-    <source src="videos/pong-ppo.mp4" type="video/mp4">
-  </video>
+  <div class="video-columns">
+    <!-- PPO Column -->
+    <div class="column">
+      <h2>PPO Agents</h2>
+      <h3>Breakout</h3>
+      <video controls>
+        <source src="videos/breakout-ppo.mp4" type="video/mp4">
+      </video>
 
-  <h2>Space Invaders</h2>
-  <video width="480" controls>
-    <source src="videos/invaders-ppo.mp4" type="video/mp4">
-  </video>
+      <h3>Pong</h3>
+      <video controls>
+        <source src="videos/pong-ppo.mp4" type="video/mp4">
+      </video>
 
-  <h1>PPG Agents</h1>
-  <h2>Breakout</h2>
-  <video width="480" controls>
-    <source src="videos/breakout-ppg.mp4" type="video/mp4">
-  </video>
+      <h3>Space Invaders</h3>
+      <video controls>
+        <source src="videos/invaders-ppo.mp4" type="video/mp4">
+      </video>
+    </div>
 
-  <h2>Pong</h2>
-  <video width="480" controls>
-    <source src="videos/pong-ppg.mp4" type="video/mp4">
-  </video>
+    <!-- PPG Column -->
+    <div class="column">
+      <h2>PPG Agents</h2>
+      <h3>Breakout</h3>
+      <video controls>
+        <source src="videos/breakout-ppg.mp4" type="video/mp4">
+      </video>
 
-  <h2>Space Invaders</h2>
-  <video width="480" controls>
-    <source src="videos/invaders-ppg.mp4" type="video/mp4">
-  </video>
+      <h3>Pong</h3>
+      <video controls>
+        <source src="videos/pong-ppg.mp4" type="video/mp4">
+      </video>
+
+      <h3>Space Invaders</h3>
+      <video controls>
+        <source src="videos/invaders-ppg.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
 </body>
 </html>
