@@ -61,7 +61,7 @@ class Characteristic(SVERLFunction):
 
         for epoch in tqdm(range(1 + self.epochs_completed, self.cfg.epochs + 1), initial=self.epochs_completed, total=self.cfg.epochs):
             # Gets state samples for the current epoch
-            samples = self.state_sampler.sample(self.cfg.samples_per_epoch, self.cfg.batch_size)
+            samples = self.state_sampler.sample(self.cfg.samples_per_epoch, self.cfg.minibatch_size)
 
             # EXPERIMENT 4
             # samples = self.state_sampler.sample(320, 1)

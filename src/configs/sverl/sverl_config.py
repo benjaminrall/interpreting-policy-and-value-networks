@@ -8,10 +8,10 @@ class SVERLConfig(TrainableConfig):
     model: str
     target: str
     state_sampler: str
-    batch_size: int = 64
+    minibatch_size: int = 64
     validation_sampler: str = 'ProceduralSampler'
     validation_samples: int = 5000
-    validation_batch_size: int = 64
+    validation_minibatch_size: int = 64
     agent_checkpoint: str
     epochs: int = 400
     samples_per_epoch: int = 10000

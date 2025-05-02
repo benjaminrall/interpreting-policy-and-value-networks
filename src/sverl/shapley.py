@@ -60,13 +60,13 @@ class Shapley(SVERLFunction):
 
             # Calculates the contributions of each pixel from the shapley model
             contributions = self.model(x)
-            dim = tuple(range(1, masked.dim() - 1))
+            dim = tuple(range(1, masked.dim()))
             contribution_sum = torch.sum(contributions, dim=dim)
 
             # Calculates the normalisation factor to apply to all contributions for the state
             norm_factor = (1 / np.prod(x.shape[1:])) * (target_output - cf_output - contribution_sum)
-            
-        return contributions + norm_factor
+            norm_dim = [x.shape[0]] + [1] * (x.dim() - 1) + [target_output.shape[-1]]
+        return contributions + norm_factor.view(norm_dim)
     
     def train(self, trainer: 'Trainer'):
         # Generates the validation data for tracking the training run
@@ -74,7 +74,7 @@ class Shapley(SVERLFunction):
 
         for epoch in tqdm(range(1 + self.epochs_completed, self.cfg.epochs + 1), initial=self.epochs_completed, total=self.cfg.epochs):
             # Gets state samples for the current epoch
-            samples = self.state_sampler.sample(self.cfg.samples_per_epoch, self.cfg.batch_size)
+            samples = self.state_sampler.sample(self.cfg.samples_per_epoch, self.cfg.minibatch_size)
 
             for i, x in enumerate(samples):
                 # Generates the random mask for this batch

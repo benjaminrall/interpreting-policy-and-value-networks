@@ -176,3 +176,8 @@ cython_debug/
 logs/
 data/
 checkpoints/
+
+images/
+saved_images/
+fastsverl_metrics.csv
+ignored/

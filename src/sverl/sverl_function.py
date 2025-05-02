@@ -35,7 +35,7 @@ class SVERLFunction(Trainable):
             self.model.load_state_dict(state['model'])
 
     def generate_validation_data(self) -> None:
-        xs = self.validation_sampler.sample(self.cfg.validation_samples, self.cfg.validation_batch_size, shuffle=False)
+        xs = self.validation_sampler.sample(self.cfg.validation_samples, self.cfg.validation_minibatch_size, shuffle=False)
         masks = [torch.rand(x.shape) < 0.5 for x in xs]
         return xs, masks
 
